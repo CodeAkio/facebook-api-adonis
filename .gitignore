@@ -5,3 +5,7 @@ coverage
 .DS_STORE
 .env
 tmp
+
+# Docker
+.docker/dbdata
+.docker/redisdata
