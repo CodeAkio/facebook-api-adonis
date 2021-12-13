@@ -2,20 +2,25 @@ version: '3.9'
 
 services:
   database:
-    image: mysql
+    build: .docker/mysql
     platform: linux/x86_64
     container_name: facebook
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    tty: true
+    volumes:
+      - .docker/dbdata:/var/lib/mysql
     env_file:
       - '.env'
     ports:
       - '3306:3306'
 
   phpmyadmin:
-    image: phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
     restart: always
     ports:
       - '8080:80'
     environment:
       - PMA_ARBITRARY=1
+    depends_on:
+      - db
