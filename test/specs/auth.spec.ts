@@ -18,7 +18,7 @@ test.group('/auth', (group) => {
 
     const { body } = await request
       .post('/auth')
-      .send({ email: user.email, password: user.password })
+      .send({ email: user.email, password: 'secret' })
       .expect(200)
 
     assert.exists(body.token)
@@ -32,16 +32,14 @@ test.group('/auth', (group) => {
   })
 
   test('[destroy] - should able to delete token after logout', async (assert) => {
-    const user = await UserFactory.merge({ password: 'secret' }).create()
+    const password = 'secret'
+    const user = await UserFactory.merge({ password }).create()
 
-    const { body } = await request
-      .post('/auth')
-      .send({ email: user.email, password: user.password })
-      .expect(200)
+    const { body } = await request.post('/auth').send({ email: user.email, password }).expect(200)
 
-    await request.delete('/auth').set('Authorization', `bearer ${body.token}`).expect(200)
+    await request.delete('/auth').set('Authorization', `bearer ${body.token}`).expect(204)
 
-    const token = Database.from('api_tokens').where({ user_id: user.id }).first()
+    const token = await Database.from('api_tokens').where({ user_id: user.id }).first()
 
     assert.isNull(token)
   })
